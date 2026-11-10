@@ -1,0 +1,26 @@
+# Fixed split and cross-validation seeds per AGENTS.md §5.
+# Do not declare ad-hoc seeds inside scripts; load them from this file.
+
+holdout:
+  test_size: 0.15
+  random_state: 42
+  stratify: true
+  group_near_duplicates: true
+
+cv:
+  n_splits: 5
+  seeds:
+    - 42
+    - 100
+    - 2026
+    - 7
+    - 999
+
+tuning:
+  inner_n_splits: 5
+  random_state: 42
+  equal_budget_trials: 30
+
+model:
+  default_random_state: 42
+
