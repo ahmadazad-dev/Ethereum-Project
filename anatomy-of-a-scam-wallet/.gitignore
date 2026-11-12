@@ -1,0 +1,55 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Environment & secrets
+.env
+.env.*
+
+# Raw datasets & large derived files
+data/
+*.csv
+*.parquet
+*.feather
+*.jsonl
+*.sqlite
+*.db
+*.zip
+*.tar.gz
+
+# Model weights & checkpoints (especially >100MB)
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.h5
+*.onnx
+*.pkl
+*.joblib
+weights/
+checkpoints/
+
+# LaTeX build artifacts
+report/*.aux
+report/*.bbl
+report/*.blg
+report/*.fdb_latexmk
+report/*.fls
+report/*.log
+report/*.out
+report/*.synctex.gz
+report/*.toc
