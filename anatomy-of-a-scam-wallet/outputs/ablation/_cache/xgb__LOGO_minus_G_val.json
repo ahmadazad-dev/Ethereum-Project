@@ -1,0 +1,21 @@
+{
+  "model": "xgb",
+  "config": "LOGO_minus_G_val",
+  "family": "LOGO",
+  "group": "G_val",
+  "k": 16,
+  "repeats": 5,
+  "folds": 5,
+  "cv_f1_mean": 0.8323389218738667,
+  "cv_f1_std": 0.003832990872958804,
+  "cv_precision_mean": 0.7919503361722597,
+  "cv_precision_std": 0.005438768703321203,
+  "cv_recall_mean": 0.8770816812053926,
+  "cv_recall_std": 0.0024053530353850983,
+  "cv_auc_mean": 0.9100688563952051,
+  "cv_auc_std": 0.000406974570147385,
+  "test_f1": 0.8120300751879699,
+  "test_precision": 0.7714285714285715,
+  "test_recall": 0.8571428571428571,
+  "test_auc": 0.9018445322793149
+}

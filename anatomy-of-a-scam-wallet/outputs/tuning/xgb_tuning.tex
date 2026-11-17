@@ -1,0 +1,22 @@
+\begin{table}[!htbp]
+\centering
+\caption{Top-10 XGBoost Hyperparameter Configurations (5-Fold Train CV)}
+\label{tab:xgb_tuning}
+\footnotesize
+\begin{tabularx}{\linewidth}{r X c c c}
+\toprule
+\textbf{Rank} & \textbf{Key Parameters} & \textbf{Val $F_1$} & \textbf{Train $F_1$} & \textbf{Gap} \\
+\midrule
+1 & n=500, lr=0.1, d=10, sub=0.6, spw=2.0 & 0.8674 $\pm$ 0.0274 & 1.0000 & 0.1326 \\
+2 & n=100, lr=0.1, d=10, sub=0.6, spw=2.0 & 0.8654 $\pm$ 0.0282 & 0.9979 & 0.1325 \\
+3 & n=300, lr=0.1, d=10, sub=0.8, spw=2.0 & 0.8654 $\pm$ 0.0260 & 0.9995 & 0.1341 \\
+4 & n=100, lr=0.1, d=10, sub=0.8, spw=2.0 & 0.8650 $\pm$ 0.0280 & 0.9839 & 0.1189 \\
+5 & n=500, lr=0.05, d=6, sub=0.8, spw=2.0 & 0.8644 $\pm$ 0.0259 & 0.9899 & 0.1255 \\
+6 & n=300, lr=0.05, d=3, sub=0.8, spw=1.0 & 0.8639 $\pm$ 0.0214 & 0.9294 & 0.0656 \\
+7 & n=500, lr=0.05, d=6, sub=0.8, spw=1.0 & 0.8625 $\pm$ 0.0236 & 0.9999 & 0.1374 \\
+8 & n=300, lr=0.05, d=10, sub=0.6, spw=0.999 & 0.8619 $\pm$ 0.0241 & 0.9439 & 0.0819 \\
+9 & n=500, lr=0.1, d=6, sub=1.0, spw=1.0 & 0.8613 $\pm$ 0.0296 & 0.9991 & 0.1379 \\
+\textbf{30} & \textbf{n=300, lr=0.05, d=3, sub=0.6, spw=2.0 (Chosen)} & \textbf{0.8554 $\pm$ 0.0209} & \textbf{0.9182} & \textbf{0.0628} \\
+\bottomrule
+\end{tabularx}
+\end{table}

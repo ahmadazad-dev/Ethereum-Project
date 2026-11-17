@@ -1,0 +1,401 @@
+{
+  "mann_whitney": {
+    "rf": {
+      "fn_vs_tp": {
+        "G_temp_lifespan_days": {
+          "n_a": 210,
+          "n_b": 1051,
+          "mean_a": 636.7770265652557,
+          "median_a": 293.1551388888889,
+          "mean_b": 292.17927508413504,
+          "median_b": 22.255057870370372,
+          "rank_biserial_r": -0.4458,
+          "p_value": 1.752229192115859e-24
+        },
+        "G_temp_sent_tx_count": {
+          "n_a": 210,
+          "n_b": 1051,
+          "mean_a": 21.414285714285715,
+          "median_a": 7.0,
+          "mean_b": 14.607040913415794,
+          "median_b": 5.0,
+          "rank_biserial_r": -0.1189,
+          "p_value": 0.00622237794980577
+        },
+        "G_temp_recv_tx_count": {
+          "n_a": 210,
+          "n_b": 1051,
+          "mean_a": 20.066666666666666,
+          "median_a": 6.0,
+          "mean_b": 21.125594671741197,
+          "median_b": 6.0,
+          "rank_biserial_r": 0.0132,
+          "p_value": 0.7619570975510918
+        },
+        "G_temp_burstiness_max_1h": {
+          "n_a": 210,
+          "n_b": 1051,
+          "mean_a": 3.5047619047619047,
+          "median_a": 2.0,
+          "mean_b": 4.191246431969553,
+          "median_b": 3.0,
+          "rank_biserial_r": 0.1033,
+          "p_value": 0.015581084690025023
+        },
+        "G_val_total_eth_sent": {
+          "n_a": 210,
+          "n_b": 1051,
+          "mean_a": 568.8525300082771,
+          "median_a": 3.3975076163823337,
+          "mean_b": 186.92807988098724,
+          "median_b": 2.2,
+          "rank_biserial_r": -0.1035,
+          "p_value": 0.01729797072646483
+        },
+        "G_val_total_eth_recv": {
+          "n_a": 210,
+          "n_b": 1051,
+          "mean_a": 367.83245317596067,
+          "median_a": 2.450556782780607,
+          "mean_b": 161.87058159194746,
+          "median_b": 1.2527746455562312,
+          "rank_biserial_r": -0.1041,
+          "p_value": 0.01708852926077611
+        },
+        "G_net_unique_sent_to": {
+          "n_a": 210,
+          "n_b": 1051,
+          "mean_a": 9.552380952380952,
+          "median_a": 4.0,
+          "mean_b": 7.08848715509039,
+          "median_b": 3.0,
+          "rank_biserial_r": -0.1331,
+          "p_value": 0.002153670256726441
+        },
+        "G_net_unique_recv_from": {
+          "n_a": 210,
+          "n_b": 1051,
+          "mean_a": 14.676190476190476,
+          "median_a": 4.0,
+          "mean_b": 17.600380589914366,
+          "median_b": 4.0,
+          "rank_biserial_r": 0.0654,
+          "p_value": 0.13302725647432848
+        },
+        "G_tok_mean_tx_fee_eth": {
+          "n_a": 210,
+          "n_b": 1051,
+          "mean_a": 0.0007839938175737661,
+          "median_a": 0.00047699844099703735,
+          "mean_b": 0.0032372252939871483,
+          "median_b": 0.000861,
+          "rank_biserial_r": 0.2581,
+          "p_value": 2.91200839907377e-09
+        }
+      },
+      "fp_vs_tn": {
+        "G_temp_lifespan_days": {
+          "n_a": 169,
+          "n_b": 1092,
+          "mean_a": 496.1714319663598,
+          "median_a": 39.792245370370374,
+          "mean_b": 749.3693852280051,
+          "median_b": 331.0510011574074,
+          "rank_biserial_r": 0.4164,
+          "p_value": 2.7560693157651946e-18
+        },
+        "G_temp_sent_tx_count": {
+          "n_a": 169,
+          "n_b": 1092,
+          "mean_a": 24.28994082840237,
+          "median_a": 6.0,
+          "mean_b": 39.63553113553114,
+          "median_b": 6.0,
+          "rank_biserial_r": 0.0391,
+          "p_value": 0.4115183101904951
+        },
+        "G_temp_recv_tx_count": {
+          "n_a": 169,
+          "n_b": 1092,
+          "mean_a": 17.550295857988164,
+          "median_a": 5.0,
+          "mean_b": 50.09615384615385,
+          "median_b": 7.0,
+          "rank_biserial_r": 0.1618,
+          "p_value": 0.000686773114083839
+        },
+        "G_temp_burstiness_max_1h": {
+          "n_a": 169,
+          "n_b": 1092,
+          "mean_a": 4.8579881656804735,
+          "median_a": 3.0,
+          "mean_b": 3.878205128205128,
+          "median_b": 2.0,
+          "rank_biserial_r": -0.2273,
+          "p_value": 7.122032736446467e-07
+        },
+        "G_val_total_eth_sent": {
+          "n_a": 169,
+          "n_b": 1092,
+          "mean_a": 164.99960776710998,
+          "median_a": 2.4481339674012563,
+          "mean_b": 2954.067559625857,
+          "median_b": 5.9824489003345,
+          "rank_biserial_r": 0.172,
+          "p_value": 0.00030214831162177794
+        },
+        "G_val_total_eth_recv": {
+          "n_a": 169,
+          "n_b": 1092,
+          "mean_a": 113.0501631794927,
+          "median_a": 1.5110000000000001,
+          "mean_b": 2127.8437051220762,
+          "median_b": 6.097330524280194,
+          "rank_biserial_r": 0.3068,
+          "p_value": 1.3135668566457835e-10
+        },
+        "G_net_unique_sent_to": {
+          "n_a": 169,
+          "n_b": 1092,
+          "mean_a": 8.502958579881657,
+          "median_a": 3.0,
+          "mean_b": 27.431318681318682,
+          "median_b": 3.0,
+          "rank_biserial_r": -0.0159,
+          "p_value": 0.7373686811573178
+        },
+        "G_net_unique_recv_from": {
+          "n_a": 169,
+          "n_b": 1092,
+          "mean_a": 12.2603550295858,
+          "median_a": 3.0,
+          "mean_b": 23.14010989010989,
+          "median_b": 3.0,
+          "rank_biserial_r": -0.0284,
+          "p_value": 0.5485786388680933
+        },
+        "G_tok_mean_tx_fee_eth": {
+          "n_a": 169,
+          "n_b": 1092,
+          "mean_a": 0.002081275202680063,
+          "median_a": 0.00063051,
+          "mean_b": 0.000590900129020748,
+          "median_b": 0.00035378810950255,
+          "rank_biserial_r": -0.236,
+          "p_value": 7.106629975528894e-07
+        }
+      }
+    },
+    "xgb": {
+      "fn_vs_tp": {
+        "G_temp_lifespan_days": {
+          "n_a": 120,
+          "n_b": 1141,
+          "mean_a": 840.365303915895,
+          "median_a": 352.66109953703705,
+          "mean_b": 297.9489546207031,
+          "median_b": 25.076944444444443,
+          "rank_biserial_r": -0.4896,
+          "p_value": 1.0159404371002643e-18
+        },
+        "G_temp_sent_tx_count": {
+          "n_a": 120,
+          "n_b": 1141,
+          "mean_a": 26.116666666666667,
+          "median_a": 6.0,
+          "mean_b": 14.64943032427695,
+          "median_b": 5.0,
+          "rank_biserial_r": -0.0978,
+          "p_value": 0.07629054908659819
+        },
+        "G_temp_recv_tx_count": {
+          "n_a": 120,
+          "n_b": 1141,
+          "mean_a": 19.85,
+          "median_a": 5.0,
+          "mean_b": 21.064855390008763,
+          "median_b": 6.0,
+          "rank_biserial_r": 0.0474,
+          "p_value": 0.39177080310051204
+        },
+        "G_temp_burstiness_max_1h": {
+          "n_a": 120,
+          "n_b": 1141,
+          "mean_a": 3.7333333333333334,
+          "median_a": 2.0,
+          "mean_b": 4.113058720420684,
+          "median_b": 3.0,
+          "rank_biserial_r": 0.1282,
+          "p_value": 0.018087382551618077
+        },
+        "G_val_total_eth_sent": {
+          "n_a": 120,
+          "n_b": 1141,
+          "mean_a": 435.963951109916,
+          "median_a": 6.0342410778528155,
+          "mean_b": 231.0295960766572,
+          "median_b": 2.166,
+          "rank_biserial_r": -0.1411,
+          "p_value": 0.010619729136951552
+        },
+        "G_val_total_eth_recv": {
+          "n_a": 120,
+          "n_b": 1141,
+          "mean_a": 497.1094961491457,
+          "median_a": 3.004291021332608,
+          "mean_b": 164.52029525170119,
+          "median_b": 1.2989182327458522,
+          "rank_biserial_r": -0.1385,
+          "p_value": 0.012472502320309418
+        },
+        "G_net_unique_sent_to": {
+          "n_a": 120,
+          "n_b": 1141,
+          "mean_a": 9.058333333333334,
+          "median_a": 4.0,
+          "mean_b": 7.334794040315512,
+          "median_b": 3.0,
+          "rank_biserial_r": -0.1023,
+          "p_value": 0.06331655906968235
+        },
+        "G_net_unique_recv_from": {
+          "n_a": 120,
+          "n_b": 1141,
+          "mean_a": 13.108333333333333,
+          "median_a": 3.0,
+          "mean_b": 17.534618755477652,
+          "median_b": 5.0,
+          "rank_biserial_r": 0.1335,
+          "p_value": 0.0156679923652646
+        },
+        "G_tok_mean_tx_fee_eth": {
+          "n_a": 120,
+          "n_b": 1141,
+          "mean_a": 0.0007512125885247835,
+          "median_a": 0.000441,
+          "mean_b": 0.0030471664987274404,
+          "median_b": 0.000861,
+          "rank_biserial_r": 0.2506,
+          "p_value": 5.624313785672229e-06
+        }
+      },
+      "fp_vs_tn": {
+        "G_temp_lifespan_days": {
+          "n_a": 256,
+          "n_b": 1005,
+          "mean_a": 418.4284269657841,
+          "median_a": 102.13850694444444,
+          "mean_b": 791.0912073313986,
+          "median_b": 344.20547453703705,
+          "rank_biserial_r": 0.4009,
+          "p_value": 3.6169851081832653e-23
+        },
+        "G_temp_sent_tx_count": {
+          "n_a": 256,
+          "n_b": 1005,
+          "mean_a": 27.09375,
+          "median_a": 5.0,
+          "mean_b": 40.24975124378109,
+          "median_b": 6.0,
+          "rank_biserial_r": 0.0579,
+          "p_value": 0.15050335039710766
+        },
+        "G_temp_recv_tx_count": {
+          "n_a": 256,
+          "n_b": 1005,
+          "mean_a": 19.625,
+          "median_a": 5.0,
+          "mean_b": 52.38507462686567,
+          "median_b": 7.0,
+          "rank_biserial_r": 0.2126,
+          "p_value": 1.3902723827008245e-07
+        },
+        "G_temp_burstiness_max_1h": {
+          "n_a": 256,
+          "n_b": 1005,
+          "mean_a": 4.5546875,
+          "median_a": 2.0,
+          "mean_b": 3.870646766169154,
+          "median_b": 2.0,
+          "rank_biserial_r": -0.1343,
+          "p_value": 0.0005443040911436335
+        },
+        "G_val_total_eth_sent": {
+          "n_a": 256,
+          "n_b": 1005,
+          "mean_a": 102.49132356221361,
+          "median_a": 2.3031845355235276,
+          "mean_b": 3211.4317711364683,
+          "median_b": 6.5778,
+          "rank_biserial_r": 0.1684,
+          "p_value": 2.9474238599297515e-05
+        },
+        "G_val_total_eth_recv": {
+          "n_a": 256,
+          "n_b": 1005,
+          "mean_a": 72.24853873606109,
+          "median_a": 1.4438087300000002,
+          "mean_b": 2312.65191806389,
+          "median_b": 6.88343057839227,
+          "rank_biserial_r": 0.3346,
+          "p_value": 1.2730637035722403e-16
+        },
+        "G_net_unique_sent_to": {
+          "n_a": 256,
+          "n_b": 1005,
+          "mean_a": 16.20703125,
+          "median_a": 3.0,
+          "mean_b": 27.107462686567164,
+          "median_b": 3.0,
+          "rank_biserial_r": -0.021,
+          "p_value": 0.6019545776936209
+        },
+        "G_net_unique_recv_from": {
+          "n_a": 256,
+          "n_b": 1005,
+          "mean_a": 14.39453125,
+          "median_a": 3.0,
+          "mean_b": 23.538308457711445,
+          "median_b": 3.0,
+          "rank_biserial_r": -0.0052,
+          "p_value": 0.8977744887156193
+        },
+        "G_tok_mean_tx_fee_eth": {
+          "n_a": 256,
+          "n_b": 1005,
+          "mean_a": 0.0016767921023017043,
+          "median_a": 0.0005821666666666667,
+          "mean_b": 0.0005649150964719911,
+          "median_b": 0.0003405316,
+          "rank_biserial_r": -0.2298,
+          "p_value": 1.1881616968427205e-08
+        }
+      }
+    }
+  },
+  "error_overlap_oof": {
+    "fp": {
+      "rf_count": 169,
+      "xgb_count": 256,
+      "shared_count": 162,
+      "jaccard_overlap": 0.616
+    },
+    "fn": {
+      "rf_count": 210,
+      "xgb_count": 120,
+      "shared_count": 117,
+      "jaccard_overlap": 0.5493
+    }
+  },
+  "inspect_cols": [
+    "G_temp_lifespan_days",
+    "G_temp_sent_tx_count",
+    "G_temp_recv_tx_count",
+    "G_temp_burstiness_max_1h",
+    "G_val_total_eth_sent",
+    "G_val_total_eth_recv",
+    "G_net_unique_sent_to",
+    "G_net_unique_recv_from",
+    "G_tok_mean_tx_fee_eth"
+  ]
+}

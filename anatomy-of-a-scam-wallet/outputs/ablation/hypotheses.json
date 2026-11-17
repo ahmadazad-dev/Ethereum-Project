@@ -1,0 +1,68 @@
+{
+  "rf": {
+    "H1_temp_minus_val": {
+      "mean": 0.0369,
+      "ci95": [
+        0.0188,
+        0.0542
+      ],
+      "ci_excludes_below_0.03": false
+    },
+    "H1_net_minus_val": {
+      "mean": 0.0056,
+      "ci95": [
+        -0.0081,
+        0.0193
+      ],
+      "ci_excludes_below_0.03": false
+    },
+    "H1_verdict": "POINT_ONLY_NOT_CI",
+    "H3_best_single_group": "G_temp",
+    "H3_best_single_f1": 0.7867,
+    "H3_full_minus_best_single": {
+      "point": 0.0597,
+      "ci95": [
+        0.0433,
+        0.0748
+      ],
+      "ci_excludes_below_0.05": false
+    },
+    "H3_verdict": "POINT_ONLY_NOT_CI"
+  },
+  "xgb": {
+    "H1_temp_minus_val": {
+      "mean": 0.0227,
+      "ci95": [
+        0.0075,
+        0.0378
+      ],
+      "ci_excludes_below_0.03": false
+    },
+    "H1_net_minus_val": {
+      "mean": -0.0126,
+      "ci95": [
+        -0.025,
+        0.0005
+      ],
+      "ci_excludes_below_0.03": false
+    },
+    "H1_verdict": "NOT SUPPORTED",
+    "H3_best_single_group": "G_temp",
+    "H3_best_single_f1": 0.7923,
+    "H3_full_minus_best_single": {
+      "point": 0.0662,
+      "ci95": [
+        0.0514,
+        0.0814
+      ],
+      "ci_excludes_below_0.05": true
+    },
+    "H3_verdict": "SUPPORTED"
+  },
+  "cross_model_spearman": {
+    "logo_drop_rho": 0.2,
+    "logo_drop_p": 0.8,
+    "only_f1_rho": 0.8,
+    "only_f1_p": 0.2
+  }
+}

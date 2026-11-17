@@ -1,0 +1,95 @@
+{
+  "archetypes": {
+    "missed_by_both_fn": {
+      "count": 117,
+      "pct_tx_lt_5": 1.71,
+      "pct_lifespan_lt_1d": 2.56,
+      "pct_zero_outgoing": 16.24,
+      "pct_only_contract_creation": 0.0
+    },
+    "caught_by_both_tp": {
+      "count": 1046,
+      "pct_tx_lt_5": 3.82,
+      "pct_lifespan_lt_1d": 11.57,
+      "pct_zero_outgoing": 21.13,
+      "pct_only_contract_creation": 0.0
+    }
+  },
+  "mann_whitney_missed_vs_caught": {
+    "G_temp_lifespan_days": {
+      "missed_median": 357.6544,
+      "caught_median": 22.1598,
+      "rank_biserial_r": -0.5182,
+      "p_value": 3.4517124438944373e-20
+    },
+    "G_temp_sent_tx_count": {
+      "missed_median": 6.0,
+      "caught_median": 5.0,
+      "rank_biserial_r": -0.1148,
+      "p_value": 0.04039214646793672
+    },
+    "G_temp_recv_tx_count": {
+      "missed_median": 5.0,
+      "caught_median": 6.0,
+      "rank_biserial_r": 0.0403,
+      "p_value": 0.4739616090592963
+    },
+    "G_temp_burstiness_max_1h": {
+      "missed_median": 2.0,
+      "caught_median": 3.0,
+      "rank_biserial_r": 0.126,
+      "p_value": 0.022302140729211894
+    },
+    "G_val_total_eth_sent": {
+      "missed_median": 6.0103,
+      "caught_median": 2.2029,
+      "rank_biserial_r": -0.1384,
+      "p_value": 0.013552756408195093
+    },
+    "G_val_total_eth_recv": {
+      "missed_median": 3.0086,
+      "caught_median": 1.2571,
+      "rank_biserial_r": -0.147,
+      "p_value": 0.009026004420874428
+    },
+    "G_net_unique_sent_to": {
+      "missed_median": 4.0,
+      "caught_median": 3.0,
+      "rank_biserial_r": -0.1237,
+      "p_value": 0.026984421953585698
+    },
+    "G_net_unique_recv_from": {
+      "missed_median": 3.0,
+      "caught_median": 5.0,
+      "rank_biserial_r": 0.1213,
+      "p_value": 0.03063222205452253
+    },
+    "G_tok_mean_tx_fee_eth": {
+      "missed_median": 0.0004,
+      "caught_median": 0.0009,
+      "rank_biserial_r": 0.2721,
+      "p_value": 1.2050606562270498e-06
+    },
+    "G_tok_contract_creation_count": {
+      "missed_median": 0.0,
+      "caught_median": 0.0,
+      "rank_biserial_r": 0.001,
+      "p_value": 0.7402001451340174
+    }
+  },
+  "time_and_cap_confound_check": {
+    "lifespan_days_median_fraud": 30.169,
+    "lifespan_days_median_normal": 277.701,
+    "mean_fee_eth_median_fraud": 0.00084,
+    "mean_fee_eth_median_normal": 0.000389,
+    "pct_at_1000_tx_cap_fraud": 0.0,
+    "pct_at_1000_tx_cap_normal": 2.78,
+    "exact_window_first_ts_median_fraud": 1638409323,
+    "exact_window_first_ts_median_normal": 1520327703,
+    "exact_window_last_ts_median_fraud": 1679537675,
+    "exact_window_last_ts_median_normal": 1543235750,
+    "exact_pct_ge_1000_tx_fraud": 0.4,
+    "exact_pct_ge_1000_tx_normal": 5.71,
+    "lifespan_mannwhitney_p": 6.22086880784667e-65
+  }
+}

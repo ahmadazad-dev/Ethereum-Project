@@ -1,0 +1,21 @@
+{
+  "model": "xgb",
+  "config": "NO_LIFESPAN",
+  "family": "EXTRA",
+  "group": "G_temp_lifespan_days",
+  "k": 27,
+  "repeats": 5,
+  "folds": 5,
+  "cv_f1_mean": 0.8442368338456893,
+  "cv_f1_std": 0.0013401677804514747,
+  "cv_precision_mean": 0.7952928285250029,
+  "cv_precision_std": 0.0018978529122357344,
+  "cv_recall_mean": 0.899603489294211,
+  "cv_recall_std": 0.001470835605946974,
+  "cv_auc_mean": 0.9161474504141509,
+  "cv_auc_std": 0.0010849055963818744,
+  "test_f1": 0.8183556405353728,
+  "test_precision": 0.7896678966789668,
+  "test_recall": 0.8492063492063492,
+  "test_auc": 0.892637555681034
+}
