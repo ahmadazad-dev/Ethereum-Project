@@ -1,0 +1,22 @@
+\begin{table*}[!htbp]
+\centering
+\caption{Grouped Behavioral Ablation Results on 5$\times$5 Repeated Stratified CV ($N=2{,}522$)}
+\label{tab:ablation}
+\footnotesize
+\begin{tabularx}{\textwidth}{l r c c c c}
+\toprule
+\textbf{Configuration} & \textbf{$k$} & \textbf{RF $F_1$ [95\% CI]} & \textbf{RF $\Delta F_1$} & \textbf{XGB $F_1$ [95\% CI]} & \textbf{XGB $\Delta F_1$} \\
+\midrule
+\texttt{FULL} & 28 & 0.8464 [0.832, 0.860] & +0.0000 & 0.8585 [0.844, 0.872] & +0.0000 \\
+\texttt{LOGO\_minus\_G\_temp} & 22 & 0.7940 [0.777, 0.811] & -0.0524 & 0.8086 [0.792, 0.824] & -0.0500 \\
+\texttt{LOGO\_minus\_G\_val} & 16 & 0.8311 [0.816, 0.846] & -0.0153 & 0.8313 [0.815, 0.847] & -0.0273 \\
+\texttt{LOGO\_minus\_G\_net} & 24 & 0.8253 [0.809, 0.841] & -0.0211 & 0.8435 [0.829, 0.858] & -0.0151 \\
+\texttt{LOGO\_minus\_G\_tok} & 22 & 0.8301 [0.815, 0.846] & -0.0163 & 0.8322 [0.818, 0.847] & -0.0264 \\
+\texttt{ONLY\_G\_temp} & 6 & 0.7867 [0.769, 0.804] & -0.0597 & 0.7923 [0.775, 0.809] & -0.0662 \\
+\texttt{ONLY\_G\_val} & 12 & 0.6984 [0.678, 0.718] & -0.1480 & 0.7242 [0.705, 0.742] & -0.1343 \\
+\texttt{ONLY\_G\_net} & 4 & 0.6723 [0.651, 0.694] & -0.1741 & 0.7202 [0.702, 0.738] & -0.1384 \\
+\texttt{ONLY\_G\_tok} & 6 & 0.6800 [0.660, 0.700] & -0.1664 & 0.7051 [0.686, 0.724] & -0.1534 \\
+\texttt{NO\_LIFESPAN} & 27 & 0.8323 [0.816, 0.847] & -0.0141 & 0.8446 [0.829, 0.859] & -0.0139 \\
+\bottomrule
+\end{tabularx}
+\end{table*}

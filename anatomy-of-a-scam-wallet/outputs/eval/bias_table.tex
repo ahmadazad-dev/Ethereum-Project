@@ -1,0 +1,40 @@
+\begin{table*}[!htbp]
+\centering
+\caption{Subgroup Fairness and Error Disparity Audit on Out-of-Fold Predictions ($N=2{,}522$)}
+\label{tab:bias_subgroups}
+\footnotesize
+\begin{tabularx}{\textwidth}{l l r c c c c c l}
+\toprule
+\textbf{Model} & \textbf{Subgroup} & \textbf{$n$} & \textbf{Fraud \%} & \textbf{FPR} & \textbf{FNR} & \textbf{$F_1$} & \textbf{FPR Ratio} & \textbf{Flag} \\
+\midrule
+RF & Tx Count: $<$5 (Sparse) & 95 & 48.4\% & 0.225 & 0.130 & 0.825 & 1.68 & OK \\
+RF & Tx Count: 5-19 & 1361 & 51.4\% & 0.138 & 0.182 & 0.840 & 1.03 & OK \\
+RF & Tx Count: 20-99 & 770 & 51.8\% & 0.132 & 0.145 & 0.864 & 0.98 & OK \\
+RF & Tx Count: $>$=100 & 296 & 39.5\% & 0.101 & 0.162 & 0.841 & 0.75 & OK \\
+RF & Burstiness: Top Decile & 312 & 61.2\% & 0.157 & 0.126 & 0.886 & 1.17 & OK \\
+RF & Burstiness: Bottom 90\% & 2210 & 48.4\% & 0.132 & 0.174 & 0.840 & 0.98 & OK \\
+RF & Value Tercile: Low & 841 & 58.6\% & 0.190 & 0.160 & 0.851 & 1.42 & High FPR* \\
+RF & Value Tercile: Mid & 840 & 51.9\% & 0.158 & 0.133 & 0.861 & 1.18 & OK \\
+RF & Value Tercile: High & 841 & 39.5\% & 0.077 & 0.220 & 0.822 & 0.57 & OK \\
+RF & Lifespan: $<$7 days & 377 & 85.9\% & 0.717 & 0.031 & 0.929 & 5.35 & High FPR* \\
+RF & Lifespan: 7-90 days & 603 & 65.7\% & 0.271 & 0.091 & 0.887 & 2.02 & High FPR* \\
+RF & Lifespan: $>$90 days & 1542 & 35.1\% & 0.075 & 0.303 & 0.759 & 0.56 & OK \\
+RF & Entity: EOA (0) & 2106 & 50.0\% & 0.129 & 0.175 & 0.845 & 0.96 & OK \\
+RF & Entity: Contract (1) & 416 & 50.0\% & 0.159 & 0.125 & 0.861 & 1.18 & OK \\
+XGB & Tx Count: $<$5 (Sparse) & 95 & 48.4\% & 0.408 & 0.043 & 0.800 & 2.01 & High FPR* \\
+XGB & Tx Count: 5-19 & 1361 & 51.4\% & 0.217 & 0.110 & 0.849 & 1.07 & OK \\
+XGB & Tx Count: 20-99 & 770 & 51.8\% & 0.181 & 0.070 & 0.886 & 0.89 & OK \\
+XGB & Tx Count: $>$=100 & 296 & 39.5\% & 0.140 & 0.111 & 0.846 & 0.69 & OK \\
+XGB & Burstiness: Top Decile & 312 & 61.2\% & 0.215 & 0.094 & 0.887 & 1.06 & OK \\
+XGB & Burstiness: Bottom 90\% & 2210 & 48.4\% & 0.202 & 0.095 & 0.854 & 0.99 & OK \\
+XGB & Value Tercile: Low & 841 & 58.6\% & 0.296 & 0.085 & 0.862 & 1.46 & High FPR* \\
+XGB & Value Tercile: Mid & 840 & 51.9\% & 0.225 & 0.076 & 0.867 & 1.11 & OK \\
+XGB & Value Tercile: High & 841 & 39.5\% & 0.122 & 0.136 & 0.843 & 0.60 & OK \\
+XGB & Lifespan: $<$7 days & 377 & 85.9\% & 0.849 & 0.018 & 0.926 & 4.18 & High FPR* \\
+XGB & Lifespan: 7-90 days & 603 & 65.7\% & 0.357 & 0.038 & 0.895 & 1.76 & High FPR* \\
+XGB & Lifespan: $>$90 days & 1542 & 35.1\% & 0.137 & 0.183 & 0.789 & 0.67 & OK \\
+XGB & Entity: EOA (0) & 2106 & 50.0\% & 0.205 & 0.100 & 0.855 & 1.01 & OK \\
+XGB & Entity: Contract (1) & 416 & 50.0\% & 0.192 & 0.072 & 0.875 & 0.95 & OK \\
+\bottomrule
+\end{tabularx}
+\end{table*}

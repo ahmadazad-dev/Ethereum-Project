@@ -1,30 +1,420 @@
-\documentclass[11pt]{article}
+\documentclass[conference]{IEEEtran}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
 \usepackage{booktabs}
-\usepackage{amsmath}
-\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=blue!70!black,urlcolor=blue!70!black]{hyperref}
 
-\graphicspath{{figures/}}
+\setlength{\parskip}{2pt plus 1pt minus 0.5pt}
 
-\title{Anatomy of a Scam Wallet}
-\author{Project Authors}
-\date{\today}
+% ---------- helper macros ----------
+% Red marker for values that still have to be copied in from a generated file.
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+% Include a figure if the file exists; otherwise show a visible placeholder instead of failing to compile.
+\newcommand{\figfile}[2]{\IfFileExists{#2}{\includegraphics[#1]{#2}}{\fbox{\parbox{0.8\linewidth}{\centering\footnotesize missing figure: \texttt{\detokenize{#2}}}}}}
+% Input a generated table if the file exists.
+\newcommand{\safeinput}[1]{\IfFileExists{#1}{\input{#1}}{\todo{missing table file \texttt{\detokenize{#1}}}}}
 
+\title{Anatomy of a Scam Wallet: Which Behavioral Feature Groups Drive Ethereum Fraud Detection?}
+
+\author{
+\IEEEauthorblockN{Ahmad Azad, Qasim Tanveer}
+\IEEEauthorblockA{Department of Data Science\\
+FAST National University of Computer and Emerging Sciences (FAST NUCES)\\
+Lahore, Pakistan}
+}
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-Placeholder abstract for Deliverables 1, 2, and 3.
+Ethereum scam wallets cause large financial losses, yet most detection studies optimize a single black-box feature set and do not show which behavioral dimensions carry the signal. We engineer 28 account-level features from raw transactions into four groups (temporal, value, network, and fee/contract interaction) and compare Random Forest and XGBoost on a matched sample of 2,522 wallets (1,261 fraud, 1,261 normal) using Fraud-Class $F_1$. On a held-out test set the models reach $F_1$ of 0.809 (RF) and 0.818 (XGBoost), a difference that is not significant (paired bootstrap $p=0.51$). In an exploratory leave-one-group-out ablation (single-repeat 5-fold cross-validation), removing the temporal group causes the largest drop for both models ($-0.052$ RF, $-0.050$ XGBoost), and the temporal group alone is the strongest single group ($F_1$ 0.787 and 0.792). Pre-registered group hypotheses receive at most partial support. Fraud and normal wallets differ strongly in observation period and lifespan, so the temporal signal is partly confounded with sampling: 72\% (RF) and 85\% (XGBoost) of normal wallets with a lifespan under seven days are falsely flagged. We therefore present the results as exploratory.
 \end{abstract}
 
-\section{Introduction}
-Placeholder section.
+\begin{IEEEkeywords}
+Ethereum, fraud detection, phishing wallets, ablation study, feature engineering, XGBoost, Random Forest.
+\end{IEEEkeywords}
 
-\bibliographystyle{plain}
+\section{Introduction}
+
+\subsection{Background and Motivation}
+As the primary programmable smart contract platform, the Ethereum blockchain has processed more than 2.4 billion transactions across hundreds of millions of addresses \cite{chithanuru2025}. However, the same architectural properties that enable permissionless decentralized finance (DeFi)---pseudonymous account creation, irreversible settlement, and composable smart contracts---have made Ethereum a primary target for organized financial crime \cite{wu2020, chen2020toit}. Malicious actors routinely deploy phishing campaigns, malicious token approvals (``wallet drainers''), rug pulls, and smart Ponzi schemes to siphon assets from retail users and decentralized protocols \cite{bartoletti2020, chen2021}. Because raw blockchain ledgers record only chronological sequences of individual transfers and contract invocations, security analysts must transform raw logs into account-level summary statistics to train automated classifiers \cite{farrugia2020, gu2025}.
+
+Despite rapid progress in applying gradient-boosted trees and Graph Neural Networks (GNNs) to Ethereum transaction data \cite{chen2020ijcai, li2022, zhang2024}, a fundamental scientific gap persists: prior studies overwhelmingly focus on maximizing aggregate accuracy or Area Under the Curve (AUC) by concatenating dozens of heterogeneous features into black-box predictors. Few works isolate \emph{which specific behavioral groups} of engineered features carry the primary discriminative signal for catching fraudulent accounts. In this paper, we address this gap by organizing raw Ethereum transaction logs into four interpretable behavioral feature groups---Temporal/Frequency Dynamics, Value/Volume Flows, Counterparty Network Activity, and Fee and Smart Contract Interaction---and conducting a grouped ablation study across Random Forest and XGBoost classifiers evaluated by Fraud-Class $F_1$. By measuring the degradation in minority-class $F_1$ when each behavioral group is removed, our framework aims to identify the on-chain anatomy of a scam wallet and to provide feature-prioritization guidance for blockchain defense systems.
+
+\subsection{Problem Statement}
+The financial damage caused by cryptocurrency fraud and Ethereum-based phishing has reached systemic scale. According to the \href{https://www.chainalysis.com/blog/2024-crypto-crime-report-introduction/}{Chainalysis 2024 Crypto Crime Report}, illicit cryptocurrency addresses received at least \$24.2 billion in 2023, while the subsequent \href{https://www.chainalysis.com/blog/2026-crypto-crime-report-introduction/}{Chainalysis 2026 Crypto Crime Report} documented at least \$154 billion flowing to illicit addresses in 2025, including an estimated \href{https://www.chainalysis.com/blog/crypto-scams-2026/}{\$17 billion stolen specifically through crypto scams and fraud}. From a law-enforcement perspective, the United States Federal Bureau of Investigation (FBI) Internet Crime Complaint Center (IC3) reported that cryptocurrency-related fraud losses rose from \href{https://www.fbi.gov/news/stories/2023-cryptocurrency-fraud-report-released}{over \$5.6 billion in 2023} to \href{https://www.trmlabs.com/resources/blog/a-record-breaking-year-for-cybercrime-key-findings-from-the-fbis-2024-ic3-report}{\$9.3 billion across 149,686 complaints in 2024}, with cryptocurrency investment schemes accounting for over \href{https://www.fbi.gov/news/press-releases/fbi-releases-annual-internet-crime-report}{\$6.5 billion in reported victim losses}.
+
+On Ethereum and Ethereum Virtual Machine (EVM) networks specifically, automated phishing ``wallet drainers''---malicious scripts that trick users into signing fraudulent \texttt{approve} or \texttt{permit} transactions---have industrialized asset theft. Industry telemetry compiled from Scam Sniffer indicates that \href{https://deepstrike.io/blog/crypto-wallet-drainer-statistics}{wallet-drainer phishing campaigns stole \$494 million from more than 332,000 victim wallets in 2024} (including 30 individual incidents exceeding \$1 million and a single theft of \$55.4 million), followed by an additional \$83.85 million drained from 106,106 wallets in 2025. Prominent drainer-as-a-service syndicates such as Pink Drainer and Inferno Drainer were individually linked to over \$85 million (across 21,000 victims) and \$80 million (across 16,000 malicious domains) in stolen assets, respectively \href{https://deepstrike.io/blog/crypto-wallet-drainer-statistics}{(Scam Sniffer / DeepStrike Telemetry)}. Academic literature similarly documents severe historical losses on Ethereum, including the Bee Token Initial Coin Offering (ICO) phishing attack that swindled nearly \$1 million within 25 hours \cite{wu2020}, the 2022 Uniswap Labs phishing campaign exceeding \$8 million \href{https://arxiv.org/html/2504.17953v1}{(arXiv:2504.17953)}, and 835 smart Ponzi contracts that extracted over \$17 million from victims \cite{chen2021}. Because community blocklists such as Etherscan labels are typically assigned only after victims report losses, a window of vulnerability remains before scam wallets are publicly flagged.
+
+\subsection{Target Audience and Research Gap}
+Unraveling which behavioral feature groups drive Ethereum fraud detection directly benefits three operational stakeholder groups:
+\begin{enumerate}
+    \item \textbf{Cryptocurrency Exchanges and AML/Compliance Teams:} Exchanges must screen incoming and outgoing deposits under strict latency and regulatory constraints. Knowing which feature groups dominate fraud-class $F_1$ allows compliance engineers to prioritize high-signal SQL/ETL aggregations over expensive multi-hop graph traversals, reducing false-positive account freezes on legitimate high-volume traders.
+    \item \textbf{Non-Custodial Wallet Providers:} Browser and mobile wallets (e.g., MetaMask, Rabby) require lightweight, pre-transaction risk scoring to warn users \emph{before} they sign a transaction interacting with a suspected drainer or phishing address \cite{chen2020ijcai}. Identifying compact, high-contribution behavioral feature subsets enables low-latency inference at the RPC endpoint level.
+    \item \textbf{Security Researchers and Blockchain Analytics Firms:} Forensic investigators gain an interpretable behavioral taxonomy that links statistical model decisions to concrete attacker operational patterns (such as rapid fund dispersion or zero-balance token sweeping).
+\end{enumerate}
+
+\textbf{The Research Gap:} Existing Ethereum fraud detection studies primarily optimize end-to-end classification metrics by feeding all available engineered or embedded features into a single classifier \cite{farrugia2020, gu2025} or deep graph architecture \cite{chen2020toit, li2022, zhang2024}. While several tabular studies report post-hoc rankings of individual variables---such as Farrugia et al.~\cite{farrugia2020} listing the top three single XGBoost features by gain, or Chithanuru and Ramaiah~\cite{chithanuru2025} applying SHAP and LIME to 17 selected attributes---individual feature importance is notoriously distorted by multicollinearity among correlated summary statistics (e.g., mean, maximum, and total Ether received). Because tree splits distribute importance across correlated variables within the same behavioral domain, single-feature rankings fail to quantify the collective necessity of an entire behavioral category. To date, prior work rarely conducts systematic \emph{grouped behavioral ablation} to measure how removing coherent on-chain behavior groups impacts Fraud-Class $F_1$ across competing tree ensemble paradigms.
+
+\subsection{Research Questions and Hypotheses}
+To address this gap, we formulate three research questions (RQs) and corresponding falsifiable hypotheses ($H_1$--$H_3$), which are tested empirically in Section~\ref{sec:results}:
+
+\begin{itemize}
+    \item \textbf{RQ1 (Behavioral Group Criticality):} Which engineered on-chain behavioral feature group---Temporal/Frequency Dynamics ($G_{\text{temp}}$), Value/Volume Flows ($G_{\text{val}}$), Counterparty Network Activity ($G_{\text{net}}$), or Fee and Smart Contract Interaction ($G_{\text{tok}}$)---causes the largest degradation in Fraud-Class $F_1$ when ablated from full-feature Random Forest and XGBoost classifiers?
+    \begin{itemize}
+        \item \emph{Hypothesis $H_1$:} We hypothesize that ablating the Temporal/Frequency Dynamics group ($G_{\text{temp}}$) or the Counterparty Network Activity group ($G_{\text{net}}$) will reduce Fraud-Class $F_1$ by at least $\Delta F_1 \ge 0.03$ (3.0 percentage points) more than ablating the Value/Volume Flow group ($G_{\text{val}}$), because scam wallets exhibit compressed active lifespans and asymmetric fan-in/fan-out counterparty ratios that are harder for attackers to disguise than raw Ether transfer amounts.
+    \end{itemize}
+    \item \textbf{RQ2 (Algorithmic Sensitivity):} How does XGBoost (utilizing gradient-boosted sequential error correction and cost-sensitive weighting) compare against Random Forest (utilizing bootstrap aggregation) in Fraud-Class $F_1$ across full and ablated feature sets?
+    \begin{itemize}
+        \item \emph{Hypothesis $H_2$:} We hypothesize that XGBoost will achieve a statistically significant higher Fraud-Class $F_1$ ($\Delta F_1 \ge 0.015$, paired bootstrap $p < 0.05$) than Random Forest on the full feature set and retain higher recall under single-group ablation due to gradient-weighted focus on hard-to-classify minority fraud instances.
+    \end{itemize}
+    \item \textbf{RQ3 (Synergy of Multi-Dimensional Feature Groups):} Can any single behavioral feature group in isolation match the Fraud-Class $F_1$ of the combined multi-group model, or is fraud detection driven by non-linear cross-group interactions?
+    \begin{itemize}
+        \item \emph{Hypothesis $H_3$:} We hypothesize that the best-performing single-group model will underperform the full four-group model by at least $\Delta F_1 \ge 0.05$ (5.0 percentage points), demonstrating that high-precision scam detection requires joint non-linear interactions across multiple behavioral domains.
+    \end{itemize}
+\end{itemize}
+
+\subsection{AI Justification}
+Deploying machine learning for Ethereum scam wallet detection requires rigorous technical justification over simpler deterministic alternatives.
+
+\textbf{Why Rule-Based and Heuristic Systems Fail:} Traditional security controls rely on static blocklists (e.g., Etherscan phishing tags) and deterministic ``if-else'' threshold heuristics (e.g., flagging accounts that transfer more than $\tau_{\text{val}} = 10\text{ ETH}$ within $\tau_{\text{time}} = 5\text{ minutes}$). These mechanisms fail against adaptive adversaries for three reasons. First, blocklists are inherently \emph{reactive}: an address is added only after victims have already lost funds and submitted forensic reports. Second, generating a new Ethereum Externally Owned Account (EOA) costs zero gas (requiring only a local secp256k1 keypair generation), allowing drainer syndicates to rotate disposable deposit addresses per campaign. Third, attackers routinely evade static thresholds via \emph{transaction structuring} (smurfing)---splitting stolen funds across dozens of micro-transactions just below $\tau_{\text{val}}$ or inserting programmed delays slightly above $\tau_{\text{time}}$.
+
+\textbf{Multi-Dimensional Non-Linearity of the Fraud Signal:} Viewed along any single axis, a scam wallet easily mimics benign actors. High transaction frequency resembles an automated arbitrage bot; high incoming counterparty degree resembles an ICO crowdsale or NFT mint; rapid outgoing dispersion resembles an exchange payout hot wallet. The discriminative signal resides in the \emph{joint, non-linear distribution} across behavioral groups---for example, an account exhibiting a short total active lifespan ($G_{\text{temp}}$), high incoming counterparty diversity paired with highly concentrated outgoing dispersion ($G_{\text{net}}$), near-zero retained ETH balance ($G_{\text{val}}$), and bursts of zero-value contract calls ($G_{\text{tok}}$). Capturing such high-order interactions requires models capable of partitioning non-linear feature spaces.
+
+\textbf{Suitability of Random Forest and XGBoost:} Tree-based ensembles are theoretically and empirically well-suited to tabular on-chain statistics \cite{farrugia2020, chithanuru2025}. \emph{Random Forest} constructs an ensemble of decorrelated decision trees via bootstrap aggregation (bagging) and random feature subspace selection, offering strong variance reduction, robustness to heavy-tailed outliers common in crypto transaction values, native capture of non-linear feature interactions without monotonic scaling assumptions, and low hyperparameter sensitivity. \emph{XGBoost} complements bagging with second-order gradient-boosted decision trees, incorporating explicit $L_1$ ($\alpha$) and $L_2$ ($\lambda$) leaf-weight regularization to prevent overfitting, sparsity-aware split finding for accounts with zero token activity, and cost-sensitive learning via the \texttt{scale\_pos\_weight} parameter \cite{gu2025}, which we treat only as a sensitivity parameter because our sample is class-balanced. Comparing both algorithms ensures that our behavioral ablation findings are not artifacts of a single ensemble mechanism.
+
+\textbf{Honest Limitations:} Supervised tabular ML on blockchain data faces four operational constraints: (1) \emph{concept drift} as DeFi protocols, Layer-2 bridges, and account abstraction (ERC-4337) alter normal transaction distributions over time; (2) \emph{adversarial adaptation}, wherein scammers intentionally pad transaction histories with benign dust transfers to mimic normal user distributions; (3) \emph{label noise and survivorship bias} in community-reported ground truth, where unflagged scam wallets may contaminate the negative class; and (4) \emph{extreme class imbalance}, where phishing wallets represent less than 1\% of active on-chain addresses \cite{wu2020, li2022}. Our matched 50/50 sample does not reproduce this prevalence, so we complement Fraud-Class $F_1$ with prevalence-adjusted precision (Section~\ref{sec:baseline}).
+
+\section{Related Work}
+
+Research on automated fraud and illicit account detection on Ethereum has evolved across four primary methodological themes, summarized below and contrasted in Table~\ref{tab:verification}.
+
+\textbf{Graph and Network-Embedding Approaches:} Because Ethereum transactions naturally form a directed multigraph where nodes represent addresses and edges represent value transfers, early studies adapted random-walk network embeddings to map topological neighborhoods into low-dimensional vectors. Wu et al.~\cite{wu2020} introduced \emph{Trans2Vec}, extending Node2Vec by biasing random walks using edge transaction amounts and the timestamp of the most recent transfer between nodes, followed by a One-Class Support Vector Machine (SVM) to classify Etherscan-labeled phishing nodes. While Trans2Vec demonstrated that incorporating edge weights and timestamps improves Precision, Recall, and $F_1$ over unweighted DeepWalk and Node2Vec baselines, its random-walk compression projects topological and transactional signals into latent coordinates, precluding direct measurement of how distinct behavioral feature categories contribute to detection.
+
+\textbf{Feature-Engineering and Classical Machine Learning Approaches:} A parallel stream of literature transforms raw transaction histories into explicit, domain-engineered tabular features for supervised tree ensembles. Farrugia et al.~\cite{farrugia2020} compiled a widely used benchmark of 2,179 flagged illicit Ethereum accounts and 2,502 normal accounts described by 42 account-level features spanning transaction timing, Ether value distributions, and ERC-20 token transfers. Training an XGBoost classifier via 10-fold cross-validation, they achieved 96.3\% accuracy and 0.994 AUC, identifying \emph{time difference between first and last transaction}, \emph{total Ether balance}, and \emph{minimum value received} as the top three individual features. Similarly, Chen et al.~\cite{chen2020ijcai} extracted 219-dimensional statistical cascade features across first-order and second-order transaction neighbors and proposed a LightGBM-based Dual-Sampling Ensemble to address class imbalance. More recently, Gu and Dib~\cite{gu2025} combined Random Forest, XGBoost, and SVM in an Optuna-tuned ensemble on the Ethereum Fraud Detection Dataset (9,841 accounts), exceeding 98\% $F_1$ with a 0.13-second inference latency. Chithanuru and Ramaiah~\cite{chithanuru2025} integrated Bayesian-optimized ensemble stacking (Random Forest, XGBoost, and Neural Networks) with SMOTEENN resampling and Explainable AI (XAI) tools (SHAP, LIME, and ELI5) across 17 selected features, reporting 99.6\% accuracy. However, these studies either optimize aggregate classification accuracy or rank individual features in isolation, leaving the collective contribution of grouped behavioral categories unquantified.
+
+\textbf{Deep Learning and Graph Neural Network (GNN) Approaches:} To capture higher-order structural dependencies automatically, researchers have increasingly turned to deep GNN architectures. Chen et al.~\cite{chen2020toit} proposed \emph{E-GCN}, combining 8 handcrafted statistical node attributes with a Graph Convolutional Network and autoencoder on Ethereum phishing subgraphs. Li et al.~\cite{li2022} observed that static node snapshots lose historical edge dynamics and proposed the \emph{Temporal Transaction Aggregation Graph Network} (TTAGN), which models directed multi-edge temporal sequences via LSTM and attention mechanisms alongside GCN structural enhancement, achieving 92.8\% AUC and 81.6\% $F_1$. Extending this paradigm to continuous-time dynamic graphs, Zhang et al.~\cite{zhang2024} developed \emph{GrabPhisher}, combining Node2Vec initialization, Temporal Graph Attention (TGAT), and EvolveGCN across three temporal datasets (up to 70,000+ nodes and 1,660 phishing accounts) to achieve 95\% Recall and 88\% $F_1$. Although TTAGN and GrabPhisher conduct architectural module ablations (e.g., removing temporal edge aggregation vs.\ structural GNN layers), deep message-passing over 70,000-node subgraphs incurs substantial computational overhead and obscures which interpretable wallet-level behaviors trigger an alert.
+
+\textbf{Ponzi and Scam Smart Contract Detection:} A closely related body of work targets fraudulent smart contracts rather than EOA phishing wallets. Bartoletti et al.~\cite{bartoletti2020} conducted a foundational forensic taxonomy of 189 smart Ponzi schemes on Ethereum, analyzing source code, payout trees, and Lorenz curves of wealth concentration. Chen et al.~\cite{chen2018} trained tree-based classifiers (XGBoost and Random Forest) on 7 account transaction features combined with EVM bytecode opcode frequencies from verified contracts, estimating over 400 Ponzi schemes on Ethereum. Addressing adversarial code obfuscation and zero-transaction deployment detection, Chen et al.~\cite{chen2021} developed \emph{SADPonzi}, a semantic-aware symbolic execution engine over EVM bytecode that achieved 100\% precision and recall on benchmarks and uncovered 835 Ponzi contracts absorbing over \$17 million in victim investments. While opcode and symbolic execution methods excel at auditing smart contract logic, they cannot detect EOA scam wallets that contain no deployed bytecode and operate purely through native ETH transfers and token approvals.
+
+\textbf{Positioning of This Work:} Unlike GNN architectures that rely on opaque subgraph embeddings \cite{wu2020, chen2020toit, li2022, zhang2024} or contract-auditing tools restricted to EVM bytecode \cite{chen2018, bartoletti2020, chen2021}, our work focuses on interpretable, account-level behavioral detection suitable for both EOA scam wallets and contract-interacting drainers. Furthermore, whereas prior tabular ensemble studies \cite{farrugia2020, chithanuru2025, gu2025} evaluate single-feature rankings or black-box accuracy, we organize engineered features into four semantically coherent behavioral groups and conduct a controlled leave-one-group-out and single-group-only ablation study across Random Forest and XGBoost, judged strictly by minority Fraud-Class $F_1$.
+
+\begin{table*}[!t]
+\centering
+\caption{Verification and Methodological Audit of Cited Literature in \texttt{references.bib}}
+\label{tab:verification}
+\footnotesize
+\begin{tabularx}{\textwidth}{l X l l l}
+\toprule
+\textbf{BibTeX Key} & \textbf{Title \& Core Methodology / Dataset / Metrics / Group Ablation Status} & \textbf{DOI} & \textbf{Verified Via} & \textbf{Conf.} \\
+\midrule
+\texttt{chen2018} & \emph{Detecting Ponzi Schemes on Ethereum: Towards Healthier Blockchain Technology} \cite{chen2018}. Verified smart contracts; 7 account + opcode features with RF/XGBoost; Precision/Recall/F-score. Compares opcode vs.\ account features, not EOA behavioral groups. & \href{https://doi.org/10.1145/3178876.3186046}{10.1145/3178876.3186046} & ACM DL / WWW '18 PDF & High \\
+\addlinespace[3pt]
+\texttt{bartoletti2020} & \emph{Dissecting Ponzi schemes on Ethereum: Identification, analysis, and impact} \cite{bartoletti2020}. 189 Ethereum Ponzi contracts; empirical taxonomy, Lorenz curves, payout trees. No ML feature-group ablation. & \href{https://doi.org/10.1016/j.future.2019.08.014}{10.1016/j.future.2019.08.014} & Elsevier FGCS / arXiv & High \\
+\addlinespace[3pt]
+\texttt{farrugia2020} & \emph{Detection of illicit accounts over the Ethereum blockchain} \cite{farrugia2020}. 2,179 illicit + 2,502 normal accounts (42 tabular features); XGBoost (10-fold CV); Acc 0.963, AUC 0.994. Reports top-3 single features, no grouped behavioral ablation. & \href{https://doi.org/10.1016/j.eswa.2020.113318}{10.1016/j.eswa.2020.113318} & Elsevier ESWA / Univ.\ Malta OAR & High \\
+\addlinespace[3pt]
+\texttt{chen2020toit} & \emph{Phishing Scams Detection in Ethereum Transaction Network} \cite{chen2020toit}. Etherscan phishing subgraphs; E-GCN + autoencoder + 8 statistical node features; Precision/Recall/$F_1$/AUC. No behavioral feature-group ablation. & \href{https://doi.org/10.1145/3398071}{10.1145/3398071} & ACM TOIT / Semantic Scholar & High \\
+\addlinespace[3pt]
+\texttt{chen2020ijcai} & \emph{Phishing Scam Detection on Ethereum: Towards Financial Security for Blockchain Ecosystem} \cite{chen2020ijcai}. 219-dim 1-order/2-order cascade features + LightGBM Dual-Sampling Ensemble; AUC/$F_1$. Tests hop depth, not behavioral domains. & \href{https://doi.org/10.24963/ijcai.2020/621}{10.24963/ijcai.2020/621} & IJCAI-20 Proceedings & High \\
+\addlinespace[3pt]
+\texttt{wu2020} & \emph{Who Are the Phishers? Phishing Scam Detection on Ethereum via Network Embedding} \cite{wu2020}. Labeled phishing graph; Trans2Vec biased random walks + One-Class SVM; Precision/Recall/$F_1$. Tunes walk bias parameter $\alpha$, not tabular behavior groups. & \href{https://doi.org/10.1109/TSMC.2020.3016821}{10.1109/TSMC.2020.3016821} & IEEE Xplore / arXiv & High \\
+\addlinespace[3pt]
+\texttt{chen2021} & \emph{SADPonzi: Detecting and Characterizing Ponzi Schemes in Ethereum Smart Contracts} \cite{chen2021}. 133 benchmark Ponzi contracts + 3.4M EOA-deployed contracts; symbolic execution; 100\% Prec/Rec. Bytecode-only, not EOA behavioral features. & \href{https://doi.org/10.1145/3460093}{10.1145/3460093} & ACM POMACS / PolyU Portal & High \\
+\addlinespace[3pt]
+\texttt{li2022} & \emph{TTAGN: Temporal Transaction Aggregation Graph Network for Ethereum Phishing Scams Detection} \cite{li2022}. Ethereum MultiDiGraph; LSTM temporal edge + Edge2Node + GCN; AUC 92.8\%, $F_1$ 81.6\%. Ablates GNN modules, not tabular behavior groups. & \href{https://doi.org/10.1145/3485447.3512226}{10.1145/3485447.3512226} & ACM WWW '22 / arXiv & High \\
+\addlinespace[3pt]
+\texttt{zhang2024} & \emph{GrabPhisher: Phishing Scams Detection in Ethereum via Temporally Evolving GNNs} \cite{zhang2024}. 3 dynamic temporal graphs (up to 70k+ nodes); Node2Vec + TGAT/TGN + EvolveGCN; Recall 95\%, $F_1$ 88\%. No tabular feature-group ablation. & \href{https://doi.org/10.1109/TSC.2024.3411449}{10.1109/TSC.2024.3411449} & IEEE CSDL / Semantic Scholar & High \\
+\addlinespace[3pt]
+\texttt{chithanuru2025} & \emph{Proactive detection of anomalous behavior in Ethereum accounts using XAI-enabled ensemble stacking with Bayesian optimization} \cite{chithanuru2025}. 9,841 accounts (17 selected features); RF+XGBoost+NN stacking + SHAP/LIME/ELI5; Acc 99.6\%. Individual XAI ranking only. & \href{https://doi.org/10.7717/peerj-cs.2630}{10.7717/peerj-cs.2630} & PeerJ CS / PubMed Central & High \\
+\addlinespace[3pt]
+\texttt{gu2025} & \emph{Enhancing fraud detection in the Ethereum blockchain using ensemble learning} \cite{gu2025}. 9,841 Ethereum accounts; Optuna-tuned RF+XGBoost+SVM ensemble; $>98\%$ Acc/Prec/Rec/$F_1$. Focuses on model ensembling, no grouped feature ablation. & \href{https://doi.org/10.7717/peerj-cs.2716}{10.7717/peerj-cs.2716} & PeerJ CS / PubMed Central & High \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+% =====================================================================
+\section{Methodology}
+\label{sec:method}
+
+\subsection{Data Collection and Preprocessing}
+\label{sec:data}
+Transaction data and ground-truth labels come from the Ethereum Fraud Dataset by Activity (\texttt{fesevu/ethereum\_fraud\_dataset\_by\_activity}, DOI: 10.57967/hf/6373, CC-BY-4.0), which contains 114,771 labeled addresses (54,771 scam and 60,000 normal). With fixed seed 42 we sampled 1,261 fraud and 1,261 normal wallets, matched on entity type (1,053 externally owned accounts and 208 contracts per class; Fig.~\ref{fig:contract_mix}), and extracted up to 1,000 transactions per wallet from 19 monthly shards using PyArrow column projection and row-group predicate pushdown, which avoids downloading the full 96\,GB repository. This produced \todo{raw transaction count from \texttt{cleaning\_report.json}} raw transactions. A deterministic eight-step cleaning pipeline standardized timestamps to UTC, converted values from Wei to Ether, flagged contract creations (null \texttt{to\_address}), removed duplicate transaction hashes, dropped invalid hexadecimal addresses and rows with corrupt timestamps, and winsorized heavy-tailed numeric fields at the 99.9th percentile before a $\log(1+x)$ transform (Fig.~\ref{fig:value_dist}; transaction value capped at \todo{cap value} ETH), leaving \todo{clean transaction count} clean transactions across 2,522 wallets. Per-step row counts are recorded in the cleaning report shipped with the repository.
+
+\begin{figure}[!t]
+  \centering
+  \figfile{width=\columnwidth}{figures/class_balance.pdf}
+  \caption{Sampled wallets and transactions touching each class.}
+  \label{fig:class_balance}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \figfile{width=\columnwidth}{figures/contract_mix_by_class.pdf}
+  \caption{Entity-type mix (EOA vs.\ smart contract) by class, confirming the matched sampling design.}
+  \label{fig:contract_mix}
+\end{figure}
+
+\begin{figure}[!t]
+  \centering
+  \figfile{width=\columnwidth}{figures/value_distribution.pdf}
+  \caption{Distribution of $\log(1+\mathrm{value\_eth})$ before and after 99.9th-percentile winsorization.}
+  \label{fig:value_dist}
+\end{figure}
+
+\subsection{Feature Engineering}
+\label{sec:features}
+To transform chronological transaction logs into account-level representations without label leakage, we compute vectorized aggregations over each wallet's outgoing (\texttt{src\_id}) and incoming (\texttt{dst\_id}) transactions, partitioning all engineered attributes into four behavioral groups ($G_{\text{temp}}$, $G_{\text{val}}$, $G_{\text{net}}$, $G_{\text{tok}}$) summarized in Table~\ref{tab:feature_groups}. Undefined directional statistics (when an account has zero sent or zero received transfers) are set to zero. We exclude \texttt{is\_contract} from the feature matrix because the sampling matched both classes identically on entity type (1,053 EOAs and 208 contracts per class), and we omit \texttt{gas\_price}, \texttt{is\_error}, and ERC-20 transfer counts because those fields are absent in the underlying monthly edge shards.
+
+To prevent train-test contamination, we partition the 2,522 balanced wallets into an 80/20 stratified split (seed 42; Fig.~\ref{fig:split_dist}), identify non-negative right-skewed features ($|\text{skew}| > 2.0$) strictly on the training fold for $\log(1+x)$ transformation, and fit a \texttt{StandardScaler} on the training split alone before transforming the test split. Spearman correlation analysis on the training set (Figs.~\ref{fig:corr_all}--\ref{fig:corr_group}) reveals substantial within-group collinearity ($|\rho| > 0.90$ for seven feature pairs, exported to \texttt{high\_corr\_pairs.csv}), empirically motivating our grouped behavioral ablation design over single-feature importance rankings, while Fig.~\ref{fig:top10_eda} highlights the strongest univariate class-separating attributes.
+
+\begin{table}[!t]
+\centering
+\caption{Engineered Account-Level Behavioral Feature Groups}
+\label{tab:feature_groups}
+\footnotesize
+\begin{tabularx}{\linewidth}{l X X}
+\toprule
+\textbf{Group} & \textbf{Engineered Features} & \textbf{Behavioral Rationale} \\
+\midrule
+$G_{\text{temp}}$ (6) & \texttt{lifespan\_days}, \texttt{mean\_inter\_tx\_sent\_sec}, \texttt{mean\_inter\_tx\_recv\_sec}, \texttt{burstiness\_max\_1h}, \texttt{sent\_tx\_count}, \texttt{recv\_tx\_count} & Captures compressed campaign lifespans and automated script burstiness. \\
+\addlinespace[2pt]
+$G_{\text{val}}$ (12) & \texttt{total\_eth\_sent/recv}, \texttt{net\_eth}, \texttt{sent/recv\_min/max/mean/std\_eth}, \texttt{in\_out\_ratio} & Detects rapid fund sweeping, zero-balance retention, and asymmetric value flows. \\
+\addlinespace[2pt]
+$G_{\text{net}}$ (4) & \texttt{unique\_sent\_to}, \texttt{unique\_recv\_from}, \texttt{unique\_cp\_per\_tx}, \texttt{fan\_in\_out\_ratio} & Isolates victim-to-collector star topologies and dispersion hubs. \\
+\addlinespace[2pt]
+$G_{\text{tok}}$ (6) & \texttt{mean/max\_tx\_fee\_eth}, \texttt{contract\_creation\_count/ratio}, \texttt{zero\_val\_call\_count/ratio} & Reflects fee urgency, contract deployment, and zero-ETH approval/token calls. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\figfile{width=\linewidth}{figures/class_distribution.pdf}
+\caption{Stratified 80/20 train and test wallet class distribution.}
+\label{fig:split_dist}
+\end{figure}
+
+\begin{figure*}[!t]
+\centering
+\figfile{width=\textwidth}{figures/corr_heatmap_all.pdf}
+\caption{Training-set Spearman correlation matrix ordered by behavioral group ($G_{\text{temp}}, G_{\text{val}}, G_{\text{net}}, G_{\text{tok}}$).}
+\label{fig:corr_all}
+\end{figure*}
+
+\begin{figure}[!t]
+\centering
+\figfile{width=\linewidth}{figures/corr_heatmap_by_group.pdf}
+\caption{Within-group Spearman correlation panels across the four behavioral groups.}
+\label{fig:corr_group}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\figfile{width=\linewidth}{figures/top10_features_by_class.pdf}
+\caption{Top-10 features by standardized class mean difference on the training set.}
+\label{fig:top10_eda}
+\end{figure}
+
+\subsection{Model Architecture and Hyperparameter Tuning}
+\label{sec:models}
+We evaluate two complementary tree-ensemble paradigms over the 28-dimensional behavioral feature matrix. \emph{Random Forest} reduces variance by training $B$ decorrelated Classification and Regression Trees (CART) in parallel on bootstrap resamples with random feature subspace selection (\texttt{max\_features}). Each internal node $m$ selects the split minimizing Gini impurity, $G(m) = 2p_m(1 - p_m)$ where $p_m$ is the fraud-class proportion, and the ensemble outputs the averaged class probability $\hat{p}(x) = \frac{1}{B}\sum_{b=1}^{B} h_b(x)$, where $h_b$ is the $b$-th tree.
+
+Conversely, \emph{XGBoost} reduces bias through sequential additive boosting. At iteration $t$, a regression tree $f_t$ is fit to minimize the second-order Taylor expansion of the regularized binary cross-entropy objective:
+\begin{equation}
+\mathcal{L}^{(t)} = \sum_{i=1}^{n} \ell\bigl(y_i, \hat{y}_i^{(t-1)} + f_t(x_i)\bigr) + \Omega(f_t),
+\end{equation}
+where $\Omega(f_t) = \gamma T_t + \frac{1}{2}\lambda \sum_{j=1}^{T_t} w_j^2$ penalizes leaf count $T_t$ and leaf weights $w_j$, and predictions update additively via $\hat{y}_i^{(t)} = \hat{y}_i^{(t-1)} + \eta f_t(x_i)$ with shrinkage $\eta$.
+
+All hyperparameter tuning is conducted strictly on the 2,017-wallet training set using 5-fold stratified cross-validation (seed 42) scored by Fraud-Class $F_1$ (\texttt{pos\_label=1}), leaving the 505-wallet test set untouched. We sample 60 Random Forest and 80 XGBoost configurations via \texttt{RandomizedSearchCV} across the search spaces in Table~\ref{tab:search_space}. To prevent overfitting to validation noise, we apply the \emph{one-standard-error (1-SE) rule}, selecting the lowest-complexity configuration within one standard error of the highest mean CV $F_1$ (Tables~\ref{tab:rf_tuning} and~\ref{tab:xgb_tuning}). The selected Random Forest (100 trees, depth 10, \texttt{min\_samples\_leaf}=4) reaches a cross-validated $F_1$ of $0.852 \pm 0.023$ and the selected XGBoost (300 rounds, depth 3, learning rate 0.05) $0.855 \pm 0.021$. Because the sample is balanced, the \texttt{scale\_pos\_weight} value of 2.0 selected for XGBoost reflects noise among near-equivalent configurations and not a genuine imbalance correction.
+
+\safeinput{tables/tuning/search_space.tex}
+\safeinput{tables/tuning/rf_tuning.tex}
+\safeinput{tables/tuning/xgb_tuning.tex}
+
+\subsection{Evaluation Protocol}
+\label{sec:eval}
+The 2,522 wallets are split 80/20 (stratified, seed 42) into 2,017 training and 505 test wallets. The tuned models are fitted on the training set and evaluated once on the test set at a decision threshold of 0.50. We report Fraud-Class precision, recall and $F_1 = 2PR/(P+R)$ (fraud as the positive class), AUC-ROC, PR-AUC and the Matthews correlation coefficient, with 95\% bootstrap confidence intervals (1,000 resamples of the test wallets). Hypothesis $H_2$ is assessed by a paired bootstrap of $\Delta F_1 = F_1^{\text{XGB}} - F_1^{\text{RF}}$ and McNemar's exact test. For robustness we also run repeated stratified $5\times5$ cross-validation over all 2,522 wallets with the tuned parameters held fixed.
+
+Because our sample is balanced, accuracy cannot expose the weakness of a model at realistic prevalence. We therefore compute prevalence-adjusted precision analytically from the test-set true-positive rate (TPR) and false-positive rate (FPR): $P_\pi = \pi\,\mathrm{TPR} / \bigl(\pi\,\mathrm{TPR} + (1-\pi)\,\mathrm{FPR}\bigr)$ for fraud prevalence $\pi$.
+
+For the bias audit we pool out-of-fold predictions over all wallets and compute false-positive rates within subgroups defined by transaction count, lifespan and total value, testing each subgroup against the overall rate with Holm correction. We additionally compare feature distributions of fraud wallets missed by both models with those caught by both, and compare observation windows between classes (Mann--Whitney $U$ test).
+
+\subsection{Ablation Protocol}
+\label{sec:ablation_protocol}
+To isolate which behavioral dimensions drive detection, we run a controlled grouped ablation over $G_{\text{temp}}, G_{\text{val}}, G_{\text{net}}, G_{\text{tok}}$. Tuned hyperparameters, preprocessing, decision threshold ($0.50$) and seed ($42$) are held constant across all feature subsets, with no per-subset retuning. We evaluate (i) the 28-feature \texttt{FULL} model, (ii) four Leave-One-Group-Out (\texttt{LOGO}) models, (iii) four single-group-only (\texttt{ONLY}) models, (iv) \texttt{NO\_LIFESPAN} (removing \texttt{lifespan\_days} alone), and (v) size-matched random-subset controls for $k \in \{4,6,12\}$. Because of time limits, the reported ablation uses a single repeat of stratified 5-fold cross-validation over all 2,522 wallets (22 configurations per model) and two random subsets per size; it is therefore exploratory, and confidence intervals are wide.
+
+% =====================================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{Baseline Classification Performance}
+\label{sec:baseline}
+Table~\ref{tab:baseline} reports held-out test performance ($N=505$, threshold 0.50). Random Forest reaches a Fraud-Class $F_1$ of 0.809 and XGBoost 0.818. XGBoost trades precision for recall: it detects more scams (recall 0.853 vs.\ 0.782) but raises more false alarms (59 vs.\ 38 false positives). Repeated $5\times5$ cross-validation over all wallets gives similar results ($F_1$ $0.843 \pm 0.013$ for RF and $0.855 \pm 0.015$ for XGBoost; AUC 0.921 and 0.926; recall 0.828 and 0.903).
+
+\begin{table}[!t]
+\centering
+\caption{Held-out test performance ($N=505$; $F_1$ with 95\% bootstrap CI).}
+\label{tab:baseline}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcc}
+\toprule
+Metric & RF & XGBoost \\
+\midrule
+Fraud $F_1$ & 0.809 [0.769, 0.845] & 0.818 [0.780, 0.850] \\
+Precision & 0.838 & 0.785 \\
+Recall & 0.782 & 0.853 \\
+AUC-ROC & 0.899 & 0.910 \\
+PR-AUC & 0.916 & 0.921 \\
+MCC & 0.633 & 0.622 \\
+TN / FP / FN / TP & 215 / 38 / 55 / 197 & 194 / 59 / 37 / 215 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Hypothesis $H_2$.} The paired bootstrap difference is $\Delta F_1 = +0.009$ (95\% CI $[-0.018, +0.036]$, $p=0.506$; McNemar exact $p=0.771$). The pre-registered threshold ($\Delta F_1 \ge 0.015$ with $p<0.05$) is not met, so $H_2$ is \emph{not supported}: the two models are statistically indistinguishable on this sample. We did not evaluate the recall clause of $H_2$ separately, since its primary $F_1$ clause already fails.
+
+\textbf{Why accuracy is uninformative.} On our matched sample an always-``normal'' baseline scores accuracy 0.501 and $F_1=0$, and a stratified random baseline reaches $F_1=0.513$. At realistic prevalence the problem is more severe: with 5\% scams an always-``normal'' model reaches about 95\% accuracy with a fraud $F_1$ of zero. Table~\ref{tab:prevalence} shows how the precision of our models collapses as prevalence falls: at 5\% prevalence only about one in five (RF) or one in six (XGBoost) flagged wallets is a scam, so a deployment would need a much stricter operating point than our balanced evaluation suggests.
+
+\begin{table}[!t]
+\centering
+\caption{Prevalence-adjusted precision (P) and $F_1$ computed from test-set TPR/FPR. ``Acc.'' is the accuracy of an always-normal classifier, whose fraud $F_1$ is 0 at every prevalence.}
+\label{tab:prevalence}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccccc}
+\toprule
+Fraud prevalence & Acc. & P (RF) & $F_1$ (RF) & P (XGB) & $F_1$ (XGB) \\
+\midrule
+50\% & 0.500 & 0.839 & 0.809 & 0.785 & 0.818 \\
+10\% & 0.900 & 0.366 & 0.499 & 0.289 & 0.432 \\
+5\% & 0.950 & 0.215 & 0.337 & 0.161 & 0.272 \\
+1\% & 0.990 & 0.050 & 0.094 & 0.036 & 0.068 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[!t]
+\centering
+\figfile{width=0.32\textwidth}{figures/confusion_matrices.pdf}\hfill
+\figfile{width=0.32\textwidth}{figures/roc_curves.pdf}\hfill
+\figfile{width=0.32\textwidth}{figures/pr_curves.pdf}
+\caption{Test-set confusion matrices (left), ROC curves (center) and precision--recall curves (right) for Random Forest and XGBoost.}
+\label{fig:baseline_curves}
+\end{figure*}
+
+\subsection{Ablation Results}
+\label{sec:ablation}
+\emph{The numbers in this subsection come from a single-repeat 5-fold run and should be treated as exploratory.} On the full feature set, single-repeat $F_1$ is 0.846 (RF) and 0.859 (XGBoost). Removing the temporal group $G_{\text{temp}}$ causes the largest drop for both models ($\Delta F_1 = -0.052$ for RF and $-0.050$ for XGBoost), and $G_{\text{temp}}$ is also the strongest group on its own ($F_1$ 0.787 for RF and 0.792 for XGBoost). Table~\ref{tab:ablation} and Fig.~\ref{fig:ablation} give all configurations, and Table~\ref{tab:controls} the size-matched random control bands.
+
+\safeinput{tables/ablation/ablation_table.tex}
+\safeinput{tables/ablation/controls_table.tex}
+
+\textbf{Hypothesis $H_1$} (ablating $G_{\text{temp}}$ or $G_{\text{net}}$ hurts at least 0.03 more than ablating $G_{\text{val}}$). For Random Forest, the $G_{\text{temp}}$-minus-$G_{\text{val}}$ difference in $\Delta F_1$ is $+0.037$ and the $G_{\text{net}}$-minus-$G_{\text{val}}$ difference is $+0.006$; the point estimate for $G_{\text{temp}}$ exceeds 0.03, but this is not confirmed by the bootstrap confidence interval, so we regard $H_1$ as unconfirmed. For XGBoost the differences are $+0.023$ and $-0.013$, and $H_1$ is \emph{not supported}.
+
+\textbf{Hypothesis $H_3$} (the best single group underperforms the full model by at least 0.05). The gap between \texttt{FULL} and the best single group ($G_{\text{temp}}$) is 0.060 for Random Forest (point estimate only, not confirmed by its confidence interval) and 0.066 for XGBoost, for which $H_3$ is \emph{supported}. No single group matches the full model, consistent with the view that detection draws on several behavioral dimensions.
+
+\textbf{Cross-model agreement.} The Spearman correlation between the RF and XGBoost group rankings is $\rho=0.20$ ($p=0.80$) for LOGO drops and $\rho=0.80$ ($p=0.20$) for single-group $F_1$. With only four groups these correlations have little statistical power, so we do not claim that the two models rely on different groups. Grouped permutation importance is shown in Fig.~\ref{fig:importance}; \todo{SHAP importance was skipped in the run reported here; add Table~\ref{tab:group_imp} values if SHAP is computed}.
+
+\safeinput{tables/ablation/importance_perm_shap.tex}
+
+\begin{figure*}[!t]
+\centering
+\figfile{width=0.48\textwidth}{figures/ablation_logo_bars.pdf}\hfill
+\figfile{width=0.48\textwidth}{figures/ablation_only_bars.pdf}
+\caption{LOGO $\Delta F_1$ (left) and single-group $F_1$ (right) from the single-repeat ablation, with size-matched random control bands.}
+\label{fig:ablation}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centering
+\figfile{width=0.48\textwidth}{figures/group_importance.pdf}\hfill
+\figfile{width=0.48\textwidth}{figures/feature_importance_top15.pdf}
+\caption{Grouped permutation importance (left) and top-15 per-feature importances colored by group (right).}
+\label{fig:importance}
+\end{figure*}
+
+\begin{figure*}[!t]
+\centering
+\figfile{width=0.48\textwidth}{figures/roc_pr_full.pdf}\hfill
+\figfile{width=0.48\textwidth}{figures/training_history.pdf}
+\caption{ROC/PR curves for \texttt{FULL}, the best single group and \texttt{NO\_LIFESPAN} (left), and training/learning curves (right).}
+\label{fig:roc_train}
+\end{figure*}
+
+% =====================================================================
+\section{Bias Check and Error Analysis}
+\label{sec:bias}
+
+\subsection{Subgroup False-Positive Rates}
+We audit false-positive rates (FPR) on out-of-fold predictions over all 2,522 wallets, using Holm-corrected tests against the overall rate. Both models share 162 false positives (Jaccard 0.62) and 117 false negatives (Jaccard 0.55), so their errors largely coincide. Table~\ref{tab:bias} lists the subgroups with significantly elevated FPR (all Holm-adjusted $p<0.01$).
+
+\begin{table}[!t]
+\centering
+\caption{Subgroups with significantly elevated FPR (out-of-fold, Holm-corrected).}
+\label{tab:bias}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llccc}
+\toprule
+Model & Subgroup & $n$ & FPR & Ratio \\
+\midrule
+RF & Lifespan $<7$ days & 377 & 0.717 & 5.35$\times$ \\
+RF & Lifespan 7--90 days & 603 & 0.271 & 2.02$\times$ \\
+RF & Low value tercile & 841 & 0.190 & 1.42$\times$ \\
+XGB & Lifespan $<7$ days & 377 & 0.849 & 4.18$\times$ \\
+XGB & Lifespan 7--90 days & 603 & 0.357 & 1.76$\times$ \\
+XGB & Low value tercile & 841 & 0.296 & 1.46$\times$ \\
+XGB & $<5$ transactions & 95 & 0.408 & 2.01$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Newly created wallets are the clearest case: about 72\% (RF) and 85\% (XGBoost) of normal wallets with a lifespan under seven days are wrongly flagged, so both models treat a short lifespan as a strong fraud indicator. Sparse wallets with fewer than five transactions are over-flagged only by XGBoost. These findings must be read together with the sampling confound discussed in Section~\ref{sec:discussion}. \todo{add false-negative rates by subgroup from \texttt{bias\_table.csv}}
+
+\begin{figure}[!t]
+\centering
+\figfile{width=\columnwidth}{figures/bias_fpr_fnr_by_subgroup.pdf}
+\caption{False-positive and false-negative rates by subgroup with 95\% bootstrap intervals.}
+\label{fig:bias}
+\end{figure}
+
+\subsection{Why Some Scams Evade Detection}
+\label{sec:evasion}
+Among the 117 fraud wallets missed by both models, only 1.7\% have fewer than five transactions and 2.6\% have a lifespan under one day, compared with 3.8\% and 11.6\% among the 1,046 scams caught by both. Zero-outgoing wallets make up 16.2\% of the missed and 21.1\% of the caught scams, and none of either group consists solely of contract creations. Contrary to the intuition that one-shot burner wallets evade detection, the missed scams are \emph{less} likely to be short-lived than the caught ones: the models fail mainly on scams that resemble ordinary, longer-lived accounts (Fig.~\ref{fig:pred_break}). Evasion may also arise from multi-hop laundering that account-level summaries cannot see, label noise, concept drift and adversarial padding of benign transfers; we did not test these directly.
+
+\begin{figure*}[!t]
+\centering
+\figfile{width=0.92\textwidth}{figures/prediction_breakdown.pdf}
+\caption{Per-wallet prediction breakdown across six sampled accounts (TP, TN, FP, FN) with top-5 feature contributions.}
+\label{fig:pred_break}
+\end{figure*}
+
+% =====================================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\textbf{Which group matters most.} The temporal group $G_{\text{temp}}$ carries the largest share of the signal: it causes the biggest drop when removed and is the strongest standalone group for both models. However, observation-period diagnostics show that this signal is partly confounded with sampling. Median lifespan is about 30 days for fraud wallets and 278 days for normal wallets (Mann--Whitney $p<10^{-60}$). The median first transaction is in December 2021 for fraud and March 2018 for normal wallets, and the median last transaction in March 2023 versus November 2018. Median transaction fees also differ (0.00084 vs.\ 0.00039 ETH), and fees vary with network conditions over time, so $G_{\text{tok}}$ may partly encode the sampling era. Fewer than 1\% of fraud wallets but roughly 3--6\% of normal wallets reach the 1,000-transaction cap. Our results therefore show that time-related features separate these two samples, not that scam behavior itself is short-lived; a design drawing both classes from the same period would be needed to settle this. \todo{add the \texttt{NO\_LIFESPAN} $\Delta F_1$ for RF and XGBoost from \texttt{ablation\_results.csv}}
+
+\textbf{RF vs.\ XGBoost.} The models perform equivalently overall and differ mainly in operating point: XGBoost favors recall and Random Forest precision. The choice between them should therefore follow the relative cost of a missed scam versus a false alarm, for instance a wrongly frozen legitimate account.
+
+\subsection{Limitations}
+(1) The matched 50/50 design does not reflect natural prevalence; Table~\ref{tab:prevalence} shows the consequence. (2) The cohort is modest ($N=2{,}522$). (3) Fraud and normal wallets cover different time windows (see above), drawn from 19 selected monthly shards, and the transaction cap affects the classes differently. (4) Group sizes are unequal (12/6/6/4 features), partly addressed by size-matched random controls. (5) Gas price, failed-transaction status and ERC-20 transfers are unavailable in the dataset. (6) The ablation uses a single cross-validation repeat and two random controls per size, so most hypothesis tests lack the power to be conclusive. (7) We use one dataset and a random, not time-based, split.
+
+\section{Conclusion}
+We compared Random Forest and XGBoost for Ethereum scam-wallet detection on 28 behavioral features in four groups. Both reach a Fraud-Class $F_1$ of about 0.81--0.82 on held-out data and cannot be statistically distinguished; they differ mainly in the precision--recall trade-off. In an exploratory leave-one-group-out ablation the temporal group contributes most, but fraud and normal wallets differ strongly in observation period, so this result is partly confounded with sampling, and the pre-registered hypotheses $H_1$ and $H_2$ are not supported while $H_3$ is supported for XGBoost only. A same-period sampling design, a larger repeated-cross-validation ablation and additional gas and token features are the most important next steps.
+
+\section*{Contributions and Reproducibility}
+The project was carried out by a single author, who developed all modules (data pipeline, feature engineering, modeling, ablation and report); the repository's git history confirms a single contributor. The table below is generated from the git log. All scripts, seeds and outputs are provided in the project repository, and every number in this paper can be traced to files in its \texttt{outputs/} directory.
+
+\safeinput{tables/contribution_table.tex}
+
+\bibliographystyle{ieeetr}
 \bibliography{references}
 
 \end{document}

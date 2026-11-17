@@ -1,0 +1,22 @@
+\begin{table}[!htbp]
+\centering
+\caption{Behavioral Profile of Fraud Wallets Missed vs. Caught by Both Models (OOF)}
+\label{tab:evasion}
+\footnotesize
+\begin{tabularx}{\linewidth}{X r r r}
+\toprule
+\textbf{Metric / Archetype} & \textbf{Missed ($n=117$)} & \textbf{Caught ($n=1046$)} & \textbf{Effect $r$} \\
+\midrule
+Burner ($<5$ stored txs) & 1.71\% & 3.82\% & --- \\
+Lifespan $<1$ day & 2.56\% & 11.57\% & --- \\
+Zero outgoing txs & 16.24\% & 21.13\% & --- \\
+\midrule
+\texttt{G\_temp\_lifespan\_days} (med.) & 357.654 & 22.160 & -0.518 \\
+\texttt{G\_temp\_sent\_tx\_count} (med.) & 6.000 & 5.000 & -0.115 \\
+\texttt{G\_temp\_recv\_tx\_count} (med.) & 5.000 & 6.000 & +0.040 \\
+\texttt{G\_temp\_burstiness\_max\_1h} (med.) & 2.000 & 3.000 & +0.126 \\
+\texttt{G\_val\_total\_eth\_sent} (med.) & 6.010 & 2.203 & -0.138 \\
+\texttt{G\_val\_total\_eth\_recv} (med.) & 3.009 & 1.257 & -0.147 \\
+\bottomrule
+\end{tabularx}
+\end{table}

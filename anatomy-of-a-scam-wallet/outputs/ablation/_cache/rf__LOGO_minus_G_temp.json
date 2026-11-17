@@ -1,0 +1,21 @@
+{
+  "model": "rf",
+  "config": "LOGO_minus_G_temp",
+  "family": "LOGO",
+  "group": "G_temp",
+  "k": 22,
+  "repeats": 5,
+  "folds": 5,
+  "cv_f1_mean": 0.7873706879149974,
+  "cv_f1_std": 0.0018601164917949032,
+  "cv_precision_mean": 0.808497073162831,
+  "cv_precision_std": 0.0025977103482445222,
+  "cv_recall_mean": 0.7673275178429818,
+  "cv_recall_std": 0.002487610966115507,
+  "cv_auc_mean": 0.8722211705901625,
+  "cv_auc_std": 0.0006241180236397487,
+  "test_f1": 0.7468879668049793,
+  "test_precision": 0.782608695652174,
+  "test_recall": 0.7142857142857143,
+  "test_auc": 0.8541470606687998
+}

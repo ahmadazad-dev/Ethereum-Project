@@ -1,0 +1,21 @@
+{
+  "model": "xgb",
+  "config": "LOGO_minus_G_temp",
+  "family": "LOGO",
+  "group": "G_temp",
+  "k": 22,
+  "repeats": 5,
+  "folds": 5,
+  "cv_f1_mean": 0.80571220386779,
+  "cv_f1_std": 0.0021520215369430127,
+  "cv_precision_mean": 0.7455506490960453,
+  "cv_precision_std": 0.0017342705527468387,
+  "cv_recall_mean": 0.8764472640761302,
+  "cv_recall_std": 0.004178252140307516,
+  "cv_auc_mean": 0.8768540884624503,
+  "cv_auc_std": 0.0016948510839706768,
+  "test_f1": 0.7940074906367042,
+  "test_precision": 0.75177304964539,
+  "test_recall": 0.8412698412698413,
+  "test_auc": 0.8560919756571931
+}

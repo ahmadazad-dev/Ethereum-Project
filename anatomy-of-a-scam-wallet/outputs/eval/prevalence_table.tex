@@ -1,0 +1,24 @@
+\begin{table}[!htbp]
+\centering
+\caption{Prevalence-Adjusted Precision, Fraud $F_1$, and Accuracy Across Real-World Base Rates}
+\label{tab:prevalence}
+\footnotesize
+\begin{tabularx}{\linewidth}{r l c c c}
+\toprule
+\textbf{Fraud $\pi$} & \textbf{Model} & \textbf{Precision} & \textbf{Fraud $F_1$} & \textbf{Accuracy} \\
+\midrule
+50\% & Always-Normal Dummy & 0.0000 & 0.0000 & 0.5000 \\
+50\% & Random Forest & 0.8388 & 0.8093 & 0.8158 \\
+50\% & XGBoost & 0.7853 & 0.8179 & 0.8100 \\
+10\% & Always-Normal Dummy & 0.0000 & 0.0000 & 0.9000 \\
+10\% & Random Forest & 0.3664 & 0.4990 & 0.8430 \\
+10\% & XGBoost & 0.2890 & 0.4318 & 0.7754 \\
+5\% & Always-Normal Dummy & 0.0000 & 0.0000 & 0.9500 \\
+5\% & Random Forest & 0.2150 & 0.3373 & 0.8464 \\
+5\% & XGBoost & 0.1615 & 0.2715 & 0.7711 \\
+1\% & Always-Normal Dummy & 0.0000 & 0.0000 & 0.9900 \\
+1\% & Random Forest & 0.0499 & 0.0939 & 0.8491 \\
+1\% & XGBoost & 0.0356 & 0.0684 & 0.7677 \\
+\bottomrule
+\end{tabularx}
+\end{table}

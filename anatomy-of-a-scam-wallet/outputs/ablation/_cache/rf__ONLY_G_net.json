@@ -1,0 +1,21 @@
+{
+  "model": "rf",
+  "config": "ONLY_G_net",
+  "family": "ONLY",
+  "group": "G_net",
+  "k": 4,
+  "repeats": 5,
+  "folds": 5,
+  "cv_f1_mean": 0.672187279135406,
+  "cv_f1_std": 0.00313944158454339,
+  "cv_precision_mean": 0.6821871503633166,
+  "cv_precision_std": 0.0029461072415775465,
+  "cv_recall_mean": 0.6624900872323553,
+  "cv_recall_std": 0.0044747774717417395,
+  "cv_auc_mean": 0.7612885434504669,
+  "cv_auc_std": 0.002405219047176161,
+  "test_f1": 0.6721649484536083,
+  "test_precision": 0.6995708154506438,
+  "test_recall": 0.6468253968253969,
+  "test_auc": 0.7412321977539369
+}

@@ -1,0 +1,24 @@
+\begin{table}[!htbp]
+\centering
+\caption{Size-Matched Random Feature Controls vs. Real Behavioral Groups}
+\label{tab:controls}
+\footnotesize
+\begin{tabularx}{\linewidth}{l l r c c}
+\toprule
+\textbf{Model} & \textbf{Control Family} & \textbf{$k$} & \textbf{Mean $F_1$} & \textbf{2.5--97.5\% Band} \\
+\midrule
+RF & \texttt{RAND\_ONLY\_k4} & 4 & 0.7186 & [0.7023, 0.7349] \\
+RF & \texttt{RAND\_LEAVE\_k4} & 4 & 0.8449 & [0.8419, 0.8480] \\
+RF & \texttt{RAND\_ONLY\_k6} & 6 & 0.7280 & [0.7272, 0.7288] \\
+RF & \texttt{RAND\_LEAVE\_k6} & 6 & 0.8422 & [0.8400, 0.8445] \\
+RF & \texttt{RAND\_ONLY\_k12} & 12 & 0.8138 & [0.7980, 0.8295] \\
+RF & \texttt{RAND\_LEAVE\_k12} & 12 & 0.8242 & [0.8188, 0.8295] \\
+XGB & \texttt{RAND\_ONLY\_k4} & 4 & 0.7334 & [0.7243, 0.7424] \\
+XGB & \texttt{RAND\_LEAVE\_k4} & 4 & 0.8483 & [0.8464, 0.8503] \\
+XGB & \texttt{RAND\_ONLY\_k6} & 6 & 0.7503 & [0.7463, 0.7542] \\
+XGB & \texttt{RAND\_LEAVE\_k6} & 6 & 0.8491 & [0.8491, 0.8492] \\
+XGB & \texttt{RAND\_ONLY\_k12} & 12 & 0.8193 & [0.8035, 0.8350] \\
+XGB & \texttt{RAND\_LEAVE\_k12} & 12 & 0.8326 & [0.8277, 0.8374] \\
+\bottomrule
+\end{tabularx}
+\end{table}

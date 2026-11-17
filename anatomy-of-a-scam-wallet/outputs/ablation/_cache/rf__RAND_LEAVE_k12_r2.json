@@ -1,0 +1,21 @@
+{
+  "model": "rf",
+  "config": "RAND_LEAVE_k12_r2",
+  "family": "RAND_LEAVE_k12",
+  "group": "rand_k12",
+  "k": 16,
+  "repeats": 5,
+  "folds": 5,
+  "cv_f1_mean": 0.8116919535835896,
+  "cv_f1_std": 0.004603325062220094,
+  "cv_precision_mean": 0.8300725403754863,
+  "cv_precision_std": 0.003275635481971613,
+  "cv_recall_mean": 0.794131641554322,
+  "cv_recall_std": 0.0070145422323540174,
+  "cv_auc_mean": 0.8976570965354209,
+  "cv_auc_std": 0.001382763825527805,
+  "test_f1": 0.7917525773195876,
+  "test_precision": 0.8240343347639485,
+  "test_recall": 0.7619047619047619,
+  "test_auc": 0.8744588744588745
+}

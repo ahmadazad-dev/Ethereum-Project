@@ -1,0 +1,21 @@
+{
+  "model": "rf",
+  "config": "NO_LIFESPAN",
+  "family": "EXTRA",
+  "group": "G_temp_lifespan_days",
+  "k": 27,
+  "repeats": 5,
+  "folds": 5,
+  "cv_f1_mean": 0.8348046366541212,
+  "cv_f1_std": 0.0013910722523316648,
+  "cv_precision_mean": 0.8459636907194039,
+  "cv_precision_std": 0.002200622415992489,
+  "cv_recall_mean": 0.823949246629659,
+  "cv_recall_std": 0.0031720856463124778,
+  "cv_auc_mean": 0.9119692149213803,
+  "cv_auc_std": 0.001195748844007561,
+  "test_f1": 0.7975708502024291,
+  "test_precision": 0.8140495867768595,
+  "test_recall": 0.7817460317460317,
+  "test_auc": 0.8930767300332517
+}

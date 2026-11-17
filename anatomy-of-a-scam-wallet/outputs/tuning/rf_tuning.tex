@@ -1,0 +1,22 @@
+\begin{table}[!htbp]
+\centering
+\caption{Top-10 Random Forest Hyperparameter Configurations (5-Fold Train CV)}
+\label{tab:rf_tuning}
+\footnotesize
+\begin{tabularx}{\linewidth}{r X c c c}
+\toprule
+\textbf{Rank} & \textbf{Key Parameters} & \textbf{Val $F_1$} & \textbf{Train $F_1$} & \textbf{Gap} \\
+\midrule
+1 & n=300, d=None, mf=sqrt, cw=None & 0.8603 $\pm$ 0.0206 & 1.0000 & 0.1397 \\
+2 & n=300, d=20, mf=sqrt, cw=None & 0.8595 $\pm$ 0.0209 & 1.0000 & 0.1405 \\
+3 & n=500, d=10, mf=log2, cw=None & 0.8585 $\pm$ 0.0191 & 0.9833 & 0.1248 \\
+4 & n=100, d=10, mf=log2, cw=None & 0.8571 $\pm$ 0.0181 & 0.9813 & 0.1242 \\
+5 & n=300, d=10, mf=sqrt, cw=balanced & 0.8565 $\pm$ 0.0186 & 0.9826 & 0.1261 \\
+6 & n=500, d=20, mf=log2, cw=balanced & 0.8561 $\pm$ 0.0213 & 0.9953 & 0.1392 \\
+7 & n=500, d=20, mf=log2, cw=None & 0.8554 $\pm$ 0.0198 & 0.9953 & 0.1399 \\
+8 & n=500, d=10, mf=sqrt, cw=balanced & 0.8553 $\pm$ 0.0172 & 0.9832 & 0.1279 \\
+9 & n=300, d=20, mf=log2, cw=None & 0.8540 $\pm$ 0.0184 & 1.0000 & 0.1460 \\
+\textbf{17} & \textbf{n=100, d=10, mf=log2, cw=None (Chosen)} & \textbf{0.8522 $\pm$ 0.0228} & \textbf{0.9465} & \textbf{0.0942} \\
+\bottomrule
+\end{tabularx}
+\end{table}

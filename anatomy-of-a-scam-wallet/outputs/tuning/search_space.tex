@@ -1,0 +1,27 @@
+\begin{table}[!htbp]
+\centering
+\caption{Hyperparameter Search Spaces for Random Forest and XGBoost}
+\label{tab:search_space}
+\footnotesize
+\begin{tabularx}{\linewidth}{l l X}
+\toprule
+\textbf{Model} & \textbf{Hyperparameter} & \textbf{Candidate Values} \\
+\midrule
+RF & \texttt{n\_estimators} & 100, 300, 500 \\
+RF & \texttt{max\_depth} & 5, 10, 20, None \\
+RF & \texttt{min\_samples\_split} & 2, 5, 10 \\
+RF & \texttt{min\_samples\_leaf} & 1, 2, 4 \\
+RF & \texttt{max\_features} & sqrt, log2 \\
+RF & \texttt{class\_weight} & balanced, None \\
+\midrule
+XGBoost & \texttt{n\_estimators} & 100, 300, 500 \\
+XGBoost & \texttt{learning\_rate} & 0.01, 0.05, 0.1 \\
+XGBoost & \texttt{max\_depth} & 3, 6, 10 \\
+XGBoost & \texttt{subsample} & 0.6, 0.8, 1.0 \\
+XGBoost & \texttt{colsample\_bytree} & 0.6, 0.8, 1.0 \\
+XGBoost & \texttt{min\_child\_weight} & 1, 3, 5 \\
+XGBoost & \texttt{reg\_lambda} & 1, 5, 10 \\
+XGBoost & \texttt{scale\_pos\_weight} & 1.0, 0.999, 0.5, 2.0 \\
+\bottomrule
+\end{tabularx}
+\end{table}

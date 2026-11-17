@@ -1,0 +1,21 @@
+{
+  "model": "rf",
+  "config": "LOGO_minus_G_tok",
+  "family": "LOGO",
+  "group": "G_tok",
+  "k": 22,
+  "repeats": 5,
+  "folds": 5,
+  "cv_f1_mean": 0.8257207455609036,
+  "cv_f1_std": 0.0020638345617935896,
+  "cv_precision_mean": 0.8256028015340082,
+  "cv_precision_std": 0.002943617326554125,
+  "cv_recall_mean": 0.8258524980174464,
+  "cv_recall_std": 0.003349518173186839,
+  "cv_auc_mean": 0.9027557651273078,
+  "cv_auc_std": 0.0011795858674552775,
+  "test_f1": 0.7918367346938775,
+  "test_precision": 0.8151260504201681,
+  "test_recall": 0.7698412698412699,
+  "test_auc": 0.8761998870694523
+}
